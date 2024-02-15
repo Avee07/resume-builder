@@ -1,0 +1,12 @@
+.container {
+  padding: 30px;
+  text-align: center;
+}
+
+.container .heading {
+  background-color: blueviolet;
+  background-clip: text;
+  color: transparent;
+  font-style: 3.5rem;
+  font-weight: bold;
+}
