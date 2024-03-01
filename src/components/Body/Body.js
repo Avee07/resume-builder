@@ -1,4 +1,4 @@
-import React from "react";
+import React , {useState} from "react";
 import styles from "./Body.module.css";
 import { ArrowDown } from "react-feather";
 import Editor from "../Editor/Editor";
@@ -16,7 +16,47 @@ const sections = {
   other: "Other",
 };
 
+
+
 function Body() {
+  const [resumeInformation , setResumeInformation] = useState({
+    [sections.basicInfo]:{
+      id: sections.basicInfo,
+      sectionTitle:sections.basicInfo,
+      detail:{}
+    },
+    [sections.workExp]:{
+      id: sections.workExp,
+      sectionTitle:sections.workExp,
+      detail:[]
+    },
+    [sections.project]:{
+      id: sections.project,
+      sectionTitle:sections.project,
+      detail:[]
+    },
+    [sections.education]:{
+      id: sections.education,
+      sectionTitle:sections.education,
+      detail:[]
+    },
+    [sections.achievements]:{
+      id: sections.achievements,
+      title:sections.achievements,
+      points:[]
+    },
+    [sections.summary]:{
+      id: sections.summary,
+      sectionTitle:sections.summary,
+      detail:''
+    },
+    [sections.other]:{
+      id: sections.other,
+      sectionTitle:sections.other,
+      detail:""
+    },
+  })
+
   return (
     <div className={styles.container}>
       <p className={styles.heading}>Resume Builder</p>
@@ -35,7 +75,7 @@ function Body() {
         </button>
       </div>
       <div className={styles.main}>
-        <Editor sections = {sections} />
+        <Editor sections = {sections} information = {resumeInformation} />
       </div>
     </div>
   );
