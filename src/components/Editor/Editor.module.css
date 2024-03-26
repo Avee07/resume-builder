@@ -61,6 +61,14 @@
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+  align-items: center;
+}
+
+.chips .new {
+  color: #239ce2;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
 }
 .chip {
   display: flex;

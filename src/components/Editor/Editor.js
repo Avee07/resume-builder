@@ -38,16 +38,38 @@ function Editor(props) {
     });
   };
 
-  // const handlePointUpdate = (value, index) => {
-  //   setValues((prev) => {
-  //     const tempValues = { ...prev };
-  //     tempValues.points[index] = value;
-  //     return tempValues;
-  //   });
-  //   // const tempValues = { ...values };
-  //   // tempValues.points[index] = value;
-  //   // setValues(tempValues);
-  // };
+  const handleAdd = () => {
+    const details = activeInformation?.details;
+    if (!details) return;
+    const lastDetail = details.slice(-1)[0];
+    if (Object.keys(lastDetail).length === 0) return;
+    console.log(lastDetail);
+    details.push({});
+    props.setInformation((prev) => ({
+      ...prev,
+      [sections[activeSectionKey]]: {
+        ...information[sections[activeSectionKey]],
+        details: details,
+      },
+    }));
+    setActiveDetailIndex(details?.length);
+  };
+
+  const handleDeleteDetail = (index) => {
+    const details = activeInformation?.details
+      ? [...activeInformation.details]
+      : "";
+    if (!details) return;
+    details.splice(index, 1);
+    props.setInformation((prev) => ({
+      ...prev,
+      [sections[activeSectionKey]]: {
+        ...information[sections[activeSectionKey]],
+        details: details,
+      },
+    }));
+    setActiveDetailIndex((prev) => (prev === index ? 0 : prev - 1));
+  };
 
   const workExpBody = (
     <div className={styles.detail}>
@@ -452,24 +474,7 @@ function Editor(props) {
         }));
         break;
       }
-      // case sections.achievements: {
-      //   props.setInformation((prev) => ({
-      //     prev,
-      //     [sections.achievements]: {
-      //       ...prev[sections.achievements],
-      //       details: {
-      //         points: [
-      //           ...prev[sections.achievements].details.points,
-      //           values.points[0],
-      //           values.points[1],
-      //           values.points[2],
-      //           values.points[3],
-      //         ],
-      //       },
-      //     },
-      //   }));
-      //   break;
-      // }
+
       case sections.project: {
         const tempDetail = {
           title: values.title,
@@ -480,7 +485,9 @@ function Editor(props) {
           githubLink: values.githubLink,
           deployedLink: values.deployedLink,
         };
-        const tempDetails = [...information[sections.project].details];
+        const existingDetails = information[sections.project]?.details || [];
+        const tempDetails = [...existingDetails];
+
         tempDetails[activeDetailIndex] = tempDetail;
         props.setInformation((prev) => ({
           prev,
@@ -500,33 +507,33 @@ function Editor(props) {
           obtainedMarks: values.obtainedMarks,
           points: values.points,
         };
-        const tempDetails = [...information[sections.education].details];
+        const existingDetails = information[sections.education]?.details || [];
+        const tempDetails = [...existingDetails];
+
         tempDetails[activeDetailIndex] = tempDetail;
         props.setInformation((prev) => ({
           prev,
           [sections.education]: {
             ...prev[sections.education],
             details: tempDetails,
-            sectionTitle,
           },
         }));
         break;
       }
       case sections.achievements: {
         props.setInformation((prev) => ({
-          prev,
+          ...prev,
           [sections.achievements]: {
             ...prev[sections.achievements],
-            details: {
-              points: [
-                ...prev[sections.achievements].details.points,
-                values.points[0],
-              ],
-            },
+            details: [
+              ...(prev[sections.achievements]?.details || []),
+              { points: [values.points[0]] },
+            ],
           },
         }));
         break;
       }
+
       case sections.summary: {
         props.setInformation((prev) => ({
           prev,
@@ -549,37 +556,6 @@ function Editor(props) {
       }
     }
   };
-
-  // useEffect(() => {
-  //   const activeInfo = information[sections[activeSectionKey]];
-  //   setActiveInformation(activeInfo);
-  //   setSectionTitle(sections[activeSectionKey]);
-  //   setValues({
-  //     name: activeInfo.detail?.name || "",
-  //     overview: activeInfo.details ? activeInfo.details[0]?.overview || "" : "",
-  //     startDate: activeInfo.details
-  //       ? activeInfo.details[0]?.startDate || ""
-  //       : "",
-  //     endDate: activeInfo.details ? activeInfo.details[0]?.endDate || "" : "",
-  //     points: activeInfo.details
-  //       ? activeInfo.details[0]?.points
-  //         ? [...activeInfo.details[0]?.points]
-  //         : ""
-  //       : activeInfo?.points
-  //       ? [...activeInfo.points]
-  //       : "",
-  //     certificate: activeInfo.details
-  //       ? activeInfo.details[0]?.certificate || ""
-  //       : "",
-  //     title: activeInfo?.details
-  //       ? activeInfo.details[0]?.title || ""
-  //       : activeInfo.detail.title || "",
-  //     linkedin: activeInfo.detail?.linkedin || "",
-  //     github: activeInfo.detail?.github || "",
-  //     email: activeInfo.detail?.email || "",
-  //     phone: activeInfo.detail?.phone || "",
-  //   });
-  // }, [activeSectionKey]);
 
   useEffect(() => {
     const activeInfo = information[sections[activeSectionKey]];
@@ -618,6 +594,10 @@ function Editor(props) {
     });
   }, [activeSectionKey]);
 
+  useEffect(() => {
+    setActiveInformation(information[sections[activeSectionKey]]);
+  }, [information]);
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -654,11 +634,19 @@ function Editor(props) {
                     <p>
                       {sections[activeSectionKey]} {index + 1}
                     </p>
-                    <X />
+                    <X onClick={() => handleDeleteDetail(index)} />
                   </div>
                 );
               })
             : ""}
+          {activeInformation?.details &&
+          activeInformation?.details?.length > 0 ? (
+            <div className={styles.new} onClick={handleAdd}>
+              +New
+            </div>
+          ) : (
+            ""
+          )}
         </div>
         {generateBody()}
         <button onClick={handleSubmition}>Save</button>
